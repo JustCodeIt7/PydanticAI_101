@@ -1,22 +1,3 @@
-"""
-agent_lifecycle_ollama.py  –  PydanticAI Masterclass · Video 6
------------------------------------------------------------------
-Showcases the three execution modes (`run_sync`, async `run`, and
-`run_stream`) using a **locally‑hosted Ollama** model (`llama3.2`).
-
-Prerequisites
--------------
-1. Install and start Ollama:  https://ollama.com  
-2. Pull the model once:       ollama pull llama3:latest   (or any tag)  
-3. pip install pydantic-ai
-4. (Optional) ensure the Ollama host is discoverable, e.g.:
-      export OLLAMA_BASE_URL="http://localhost:11434"   # default port
-
-Run
----
-python agent_lifecycle_ollama.py
-"""
-
 from __future__ import annotations
 
 import asyncio
@@ -33,10 +14,12 @@ model = OpenAIModel(
     'llama3.2',
     provider=OpenAIProvider(
         base_url='http://localhost:11434/v1',
-        
+
     ),
 )
 agent = Agent(model)
+
+
 # ---------------------------------------------------------------------------
 # 2. Synchronous example – run_sync
 # ---------------------------------------------------------------------------

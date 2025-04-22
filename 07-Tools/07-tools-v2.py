@@ -1,26 +1,17 @@
 """
-tools_demo.py  –  PydanticAI Masterclass · Video 7
---------------------------------------------------
 Demonstrates how to register **tools** with @agent.tool so the LLM
 can call real Python functions while reasoning.
-
 Prerequisites
 -------------
 • pip install pydantic-ai
 • Set an LLM provider key – e.g.  OPENAI_API_KEY="sk‑..."  – or switch
   the model string to your local Ollama instance ("ollama:llama3.2").
-
-Run
----
-python tools_demo.py
 """
 
 from __future__ import annotations
-
 import random
 from decimal import Decimal
-
-from pydantic_ai import Agent, RunContext  # Import RunContext
+from pydantic_ai import Agent, RunContext
 
 # ── 1. Create an Agent with a helpful system prompt ────────────────────────
 agent = Agent(
@@ -30,6 +21,7 @@ agent = Agent(
         "When appropriate, you can call the provided tools to answer."
     ),
 )
+
 
 # ── 2. Define & register a *simple* tool (no parameters) ───────────────────
 @agent.tool

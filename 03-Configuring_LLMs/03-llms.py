@@ -21,6 +21,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from pydantic_ai import Agent
+from pydantic_ai.models.gemini import GeminiModel
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # ── 1. Load environment variables safely ──────────────────────────────────
@@ -42,12 +45,14 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 
 # ── 2. Configure Agents ───────────────────────────────────────────────────
-agent_openai = Agent(
-    "openai:gpt-4o",                 # provider:model
-    system_prompt="You are a helpful assistant. Reply concisely.",
-)
+# agent_openai = Agent(
+#     "openai:gpt-4o",                 # provider:model
+#     system_prompt="You are a helpful assistant. Reply concisely.",
+# )
+model = GeminiModel('gemini-2.0-flash', provider='google-gla', api_key=GOOGLE_API_KEY)
+agent = Agent(model)
 
-# agent_gemini = Agent(
+# agent = Agent(
 #     "google-gla:gemini-1.5-flash",
 #     system_prompt="You are a creative assistant. Reply concisely.",
 # )
@@ -62,8 +67,8 @@ PROMPT = "Explain PydanticAI in one short sentence."
 print("\n🗣  Prompt:", PROMPT, "\n")
 
 # OpenAI
-result_oa = agent_openai.run_sync(PROMPT)
-print("🔵  OpenAI GPT‑4o  →", result_oa.output)
+result_oa = agent.run_sync(PROMPT)
+print("🔵  Result →", result_oa.output)
 
 # Gemini
 # result_gem = agent_gemini.run_sync(PROMPT)

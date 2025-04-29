@@ -13,10 +13,12 @@ requires-python = ">=3.9"
 # Basic ruff configuration that can be extended by child projects
 line-length = 100
 target-version = "py39"
+
+[tool.ruff.lint]
 select = ["E", "F", "I"]
 ignore = []
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["pydanticai"]
 
 [tool.uv]

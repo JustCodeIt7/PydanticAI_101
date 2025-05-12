@@ -8,6 +8,9 @@ version = "0.1.0"
 description = "Examples and tutorials for PydanticAI"
 readme = "README.md"
 requires-python = ">=3.9"
+dependencies = [
+    "yfinance",
+]
 
 [tool.ruff]
 # Basic ruff configuration that can be extended by child projects

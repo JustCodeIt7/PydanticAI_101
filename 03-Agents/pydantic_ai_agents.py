@@ -1,3 +1,4 @@
+#%%
 import asyncio
 from datetime import datetime, date
 from typing import Optional, List, Dict, Any, Union
@@ -15,8 +16,8 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from rich import print
 # base_url ='http://localhost:11434/v1'
 base_url = 'http://100.95.122.242:11434/v1'
-
-model_name = 'qwen3:1.7b'
+model_name = 'qwen3:0.6b'
+# model_name = 'qwen3:1.7b'
 # model_name ='qwen3:4b'
 # Create Ollama model to be reused throughout the tutorial
 ollama_model = OpenAIModel(
@@ -24,7 +25,7 @@ ollama_model = OpenAIModel(
     provider=OpenAIProvider(base_url=base_url)
 )
 
-
+#%%
 #####################################################
 # PART 1: Introduction to PydanticAI Agents
 #####################################################
@@ -41,6 +42,7 @@ async def run_basic_agent():
     print(f"Token usage: {result.usage()}")
 
 
+#%%
 #####################################################
 # PART 2: System Prompts and Instructions
 #####################################################

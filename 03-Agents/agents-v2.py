@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Tutorial: PydanticAI Agents
-Estimated video length: 10–15 minutes
-This script provides annotated examples demonstrating key PydanticAI Agent features.
-"""
-
-# Section 0: Imports and Setup
 import asyncio
 from datetime import date
 from typing import TypedDict, List
@@ -25,12 +17,27 @@ ollama_model = OpenAIModel(
     provider=OpenAIProvider(base_url=base_url)
 )
 
+# ========================================================================
+# Section 0.5: Simplest Agent (Direct LLM Interaction)
+# ========================================================================
+# 1. Define an agent that simply passes input to the LLM and returns its output.
+#    No tools, no complex dependencies, output_type is str.
+simple_chat_agent = Agent(
+    ollama_model,
+    output_type=str, # Expecting a string output from the LLM
+    system_prompt="You are a helpful assistant.",
+)
+
+def demo_simple_chat():
+    user_input = "Explain the concept of a Large Language Model in one sentence."
+    result = simple_chat_agent.run_sync(user_input)
+    print("Simple Chat Agent Output:", result.output)
 
 # ========================================================================
 # Section 1: Create a Basic Agent and Tool (Roulette Wheel Example)
 # ========================================================================
 # 1. Define a simple Agent that takes an `int` dependency and returns a `bool`.
-roulette_agent = Agent(
+agent = Agent(
     ollama_model,
     deps_type=int,
     output_type=bool,
@@ -40,7 +47,7 @@ roulette_agent = Agent(
 )
 
 # 2. Register a tool on the agent for checking the winning square.
-@roulette_agent.tool
+@agent.tool
 async def roulette_wheel(ctx: RunContext[int], square: int) -> str:
     """Return 'winner' if square matches the secret number, else 'loser'."""
     return "winner" if square == ctx.deps else "loser"
@@ -51,36 +58,35 @@ async def roulette_wheel(ctx: RunContext[int], square: int) -> str:
 
 def demo_basic_runs(secret: int):
     # Synchronous run
-    result_sync = roulette_agent.run_sync(
+    result_sync = agent.run_sync(
         f"I bet on square {secret}",
         deps=secret,
     )
-    print("Sync output:", result_sync.output)
+    print("Sync result:", result_sync.output)
 
     # Asynchronous run via asyncio
     async def async_run():
-        result = await roulette_agent.run(
+        result = await agent.run(
             f"Try square {secret}", deps=secret
         )
-        print("Async output:", result.output)
+        print("Async result:", result.output) # Changed to print result.output for consistency
     asyncio.run(async_run())
 
     # Streaming run
     async def stream_run():
-        async with roulette_agent.run_stream(
-            "Will square 5 win?", deps=secret
+        async with agent.run_stream(
+            f"Will square {secret} win?", deps=secret
         ) as stream:
             out = await stream.get_output()
-            print("Streamed output:", out)
+            print("Streamed output value:", out)
     asyncio.run(stream_run())
-
 
 # ========================================================================
 # Section 3: Iterating Over Agent Graph (Async For)
 # ========================================================================
 async def demo_iteration():
     numbers = []
-    async with roulette_agent.iter(
+    async with agent.iter(
         f"Test square {18}", deps=18
     ) as run:
         async for node in run:
@@ -92,7 +98,6 @@ async def demo_iteration():
 # ========================================================================
 # Section 4: System Prompts vs. Instructions
 # ========================================================================
-# Create another agent to illustrate system_prompt vs instructions
 instr_agent = Agent(
     ollama_model,
     deps_type=str,
@@ -119,7 +124,6 @@ def demo_prompts():
 # ========================================================================
 # Section 5: Usage Limits and Model Settings
 # ========================================================================
-# Agent with response token limit
 limited_agent = Agent(ollama_model)
 
 @limited_agent.tool
@@ -136,20 +140,8 @@ def demo_usage_limits():
     except Exception as e:
         print("Usage limit exceeded:", e)
 
-# Agent with custom Gemini settings
-# gemini_agent = Agent(
-#     "google-gla:gemini-1.5-flash",
-#     model_settings=GeminiModelSettings(
-#         temperature=0.0,
-#         gemini_safety_settings=[
-#             {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_LOW_AND_ABOVE"},
-#         ],
-#     ),
-# )
-# For Ollama, you may skip Gemini-specific settings or adapt as needed
 ollama_custom_agent = Agent(
     ollama_model,
-    # model_settings=... # Add custom settings if supported by Ollama
 )
 
 def demo_model_settings():
@@ -207,21 +199,25 @@ def demo_conversation():
 # ========================================================================
 if __name__ == "__main__":
     secret_number = 18
-    print("--- Demo: Basic Runs ---")
+
+    print("--- Demo: Simplest Chat Agent ---")
+    demo_simple_chat()
+
+    print("\n--- Demo: Basic Runs ---")
     demo_basic_runs(secret_number)
 
-    print("--- Demo: Iteration ---")
+    print("\n--- Demo: Iteration ---")
     asyncio.run(demo_iteration())
 
-    print("--- Demo: Prompts & Instructions ---")
+    print("\n--- Demo: Prompts & Instructions ---")
     demo_prompts()
 
-    print("--- Demo: Usage Limits & Settings ---")
+    print("\n--- Demo: Usage Limits & Settings ---")
     demo_usage_limits()
     demo_model_settings()
 
-    print("--- Demo: Retries & Reflection ---")
+    print("\n--- Demo: Retries & Reflection ---")
     demo_retries()
 
-    print("--- Demo: Conversation Across Runs ---")
+    print("\n--- Demo: Conversation Across Runs ---")
     demo_conversation()

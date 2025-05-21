@@ -298,38 +298,12 @@ async def run_conversation_example():
 if __name__ == "__main__":
     asyncio.run(run_conversation_example())
 
-#%%
-#####################################################
-# PART 8: Streaming Responses
-#####################################################
-
-async def run_streaming_example():
-    print("\\n=== PART 8: Streaming Responses ===")
-    agent = Agent(ollama_model)
-
-    print("Streaming response:")
-    async with agent.run_stream("What are three benefits of using type hints in Python?") as response:
-        async for chunk in response:
-            if isinstance(chunk, str) and len(chunk) > 0:
-                print(f"Chunk: {chunk[:20]}...")
-                break
-
-        full_output = await response.get_output()
-        print(f"\\nFull output: {full_output[:100]}...")
-
-# Run the streaming example
-if __name__ == "__main__":
-    # This example was commented out in the original main() function.
-    # To run it, uncomment the line below.
-    # asyncio.run(run_streaming_example())
-    print("\\n=== PART 8: Streaming Responses (Example run is commented out by default) ===")
-    pass
 
 #%%
 #####################################################
-# PART 9: Advanced Agent with Dependencies
+# PART 8: Advanced Agent with Dependencies
 #####################################################
-
+print('PART : Advanced Agent with Dependencies')
 @dataclass
 class Database:
     """Simulated database connection"""
@@ -401,15 +375,16 @@ if __name__ == "__main__":
 
 #%%
 #####################################################
-# PART 10: Usage Limits and Settings
+# PART 9: Usage Limits and Settings
 #####################################################
+
 
 limit_agent = Agent(ollama_model)
 
 
 # Convert to async and handle UsageLimitExceeded exception
 async def run_limits_example():
-    print("\\n=== PART 10: Usage Limits and Settings ===")
+    print("\\n=== PART 9: Usage Limits and Settings ===")
     
     # Set usage limits with exception handling
     try:
@@ -451,11 +426,12 @@ if __name__ == "__main__":
 
 #%%
 #####################################################
-# PART 11: Advanced Graph Iteration
+# PART 10: Advanced Graph Iteration
 #####################################################
 
+
 async def run_graph_iteration():
-    print("\\n=== PART 11: Advanced Graph Iteration ===")
+    print("\\n=== PART 10: Advanced Graph Iteration ===")
     agent = Agent(ollama_model)
     
     print("Iterating through agent graph nodes:")

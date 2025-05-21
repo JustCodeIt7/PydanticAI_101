@@ -14,6 +14,16 @@ from pydantic import BaseModel
 from pydantic_ai import Agent, RunContext, ModelRetry, UnexpectedModelBehavior, capture_run_messages
 from pydantic_ai.usage import UsageLimits
 from pydantic_ai.models.gemini import GeminiModelSettings
+from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.providers.openai import OpenAIProvider
+
+
+base_url = 'http://100.95.122.242:11434/v1'
+model_name = 'qwen3:1.7b'
+ollama_model = OpenAIModel(
+    model_name=model_name,
+    provider=OpenAIProvider(base_url=base_url)
+)
 
 
 # ========================================================================
@@ -21,7 +31,7 @@ from pydantic_ai.models.gemini import GeminiModelSettings
 # ========================================================================
 # 1. Define a simple Agent that takes an `int` dependency and returns a `bool`.
 roulette_agent = Agent(
-    "gpt-4.1-nano",
+    ollama_model,
     deps_type=int,
     output_type=bool,
     system_prompt=(
@@ -84,7 +94,7 @@ async def demo_iteration():
 # ========================================================================
 # Create another agent to illustrate system_prompt vs instructions
 instr_agent = Agent(
-    "gpt-4.1-nano",
+    ollama_model,
     deps_type=str,
     system_prompt="You are a friendly assistant.",
     instructions="Answer briefly."
@@ -110,7 +120,7 @@ def demo_prompts():
 # Section 5: Usage Limits and Model Settings
 # ========================================================================
 # Agent with response token limit
-limited_agent = Agent("gpt-4.1-nano")
+limited_agent = Agent(ollama_model)
 
 @limited_agent.tool
 def dummy_tool() -> str:
@@ -127,19 +137,24 @@ def demo_usage_limits():
         print("Usage limit exceeded:", e)
 
 # Agent with custom Gemini settings
-gemini_agent = Agent(
-    "google-gla:gemini-1.5-flash",
-    model_settings=GeminiModelSettings(
-        temperature=0.0,
-        gemini_safety_settings=[
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_LOW_AND_ABOVE"},
-        ],
-    ),
+# gemini_agent = Agent(
+#     "google-gla:gemini-1.5-flash",
+#     model_settings=GeminiModelSettings(
+#         temperature=0.0,
+#         gemini_safety_settings=[
+#             {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_LOW_AND_ABOVE"},
+#         ],
+#     ),
+# )
+# For Ollama, you may skip Gemini-specific settings or adapt as needed
+ollama_custom_agent = Agent(
+    ollama_model,
+    # model_settings=... # Add custom settings if supported by Ollama
 )
 
 def demo_model_settings():
     try:
-        gemini_agent.run_sync(
+        ollama_custom_agent.run_sync(
             "Write rude jokes.",
         )
     except UnexpectedModelBehavior as e:
@@ -154,7 +169,7 @@ class NeverOutputType(TypedDict):
     never: str
 
 retry_agent = Agent(
-    "gpt-4.1-nano",
+    ollama_model,
     deps_type=dict,
     output_type=NeverOutputType,
     retries=2,
@@ -175,7 +190,7 @@ def demo_retries():
 # ========================================================================
 # Section 7: Conversation Across Runs
 # ========================================================================
-conv_agent = Agent("gpt-4.1-nano")
+conv_agent = Agent(ollama_model)
 
 def demo_conversation():
     first = conv_agent.run_sync("Who discovered penicillin?")

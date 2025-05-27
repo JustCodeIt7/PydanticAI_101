@@ -24,7 +24,7 @@ ollama_model = OpenAIModel(
 #    No tools, no complex dependencies, output_type is str.
 simple_chat_agent = Agent(
     ollama_model,
-    output_type=str, # Expecting a string output from the LLM
+    output_type=str,
     system_prompt="You are a helpful assistant.",
 )
 

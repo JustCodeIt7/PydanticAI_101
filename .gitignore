@@ -178,3 +178,7 @@ cython_debug/
 
 examples/*
 !/archive/
+AGENTS.md
+.gitignore
+GEMINI.md
+.gitignore

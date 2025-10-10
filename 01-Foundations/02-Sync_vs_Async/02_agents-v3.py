@@ -60,7 +60,7 @@ async def demo_run_stream_events():
     events = []
     async for event in weather_agent.run_stream_events("Weather in Berlin?"):
         events.append(event)
-        if hasattr(event, "result"):
+        if hasattr(event, "result") and hasattr(event.result, "output"):
             print(f"Final Result: {event.result.output}")
     print(f"Total Events: {len(events)}")
 

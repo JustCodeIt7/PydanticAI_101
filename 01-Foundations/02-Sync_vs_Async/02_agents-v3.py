@@ -69,7 +69,7 @@ async def get_weather(ctx: RunContext, location: str, query_date: date) -> str:
 # Demonstrate the standard async `run()` method
 async def demo_run_async():
     """Demonstrate agent.run(), which returns the final result asynchronously."""
-    print("=== agent.run() Example (Async) ===")
+    print("[bold blue]=== agent.run() Example (Async) ===[/bold blue]")
     # Execute the agent and await the complete `RunResult`
     result = await weather_agent.run("Weather in Paris tomorrow?")
     print(f"Result: {result.output}")
@@ -78,7 +78,7 @@ async def demo_run_async():
 # Demonstrate the synchronous `run_sync()` method
 def demo_run_sync():
     """Demonstrate agent.run_sync() for use in synchronous code."""
-    print("=== agent.run_sync() Example (Sync) ===")
+    print("[bold cyan]=== agent.run_sync() Example (Sync) ===[/bold cyan]")
     # Execute the agent and block until the final `RunResult` is available
     result = weather_agent.run_sync("Weather in London today?")
     print(f"Result: {result.output}")
@@ -87,19 +87,19 @@ def demo_run_sync():
 # Demonstrate streaming text output with `run_stream()`
 async def demo_run_stream():
     """Demonstrate agent.run_stream() for handling real-time text output."""
-    print("=== agent.run_stream() Example (Async Stream) ===")
+    print("[bold magenta]=== agent.run_stream() Example (Async Stream) ===[/bold magenta]")
     # Use a context manager to handle the streaming response from the agent
     async with weather_agent.run_stream("Weather in Tokyo next week?") as response:
         # Iterate over incoming text chunks as the LLM generates them
         async for text in response.stream_text():
             print(text, end="")
-    print("\nStream complete.")
+    print("\n[italic yellow]Stream complete.[/italic yellow]")
 
 
 # Demonstrate processing structured events with `run_stream_events()`
 async def demo_run_stream_events():
     """Demonstrate agent.run_stream_events() for detailed, structured updates."""
-    print("=== agent.run_stream_events() Example (Async Events) ===")
+    print("[bold red]=== agent.run_stream_events() Example (Async Events) ===[/bold red]")
     events = []
     # Iterate over each event generated during the agent's execution lifecycle
     async for event in weather_agent.run_stream_events("Weather in Berlin?"):
@@ -107,13 +107,13 @@ async def demo_run_stream_events():
         # Check if the event contains the final result and print its output
         if hasattr(event, "result") and hasattr(event.result, "output"):
             print(f"Final Result: {event.result.output}")
-    print(f"Total Events: {len(events)}")
+    print(f"[yellow]Total Events: {len(events)}[/yellow]")
 
 
 # Demonstrate iterating over the agent's internal steps with `iter()`
 async def demo_iter():
     """Demonstrate agent.iter() to inspect the agent's thought process."""
-    print("=== agent.iter() Example (Async Iteration) ===")
+    print("[bold purple]=== agent.iter() Example (Async Iteration) ===[/bold purple]")
     # Use a context manager to access the agent's execution graph
     async with weather_agent.iter("Weather in Rome?") as agent_run:
         nodes = []
@@ -122,7 +122,7 @@ async def demo_iter():
             nodes.append(node)
         # Access the final output after the iteration is complete
         print(f"Final Output: {agent_run.result.output}")
-        print(f"Nodes Processed: {len(nodes)}")
+        print(f"[yellow]Nodes Processed: {len(nodes)}[/yellow]")
 
 
 ################################ Main Execution Block ################################
@@ -131,25 +131,25 @@ async def demo_iter():
 # Define the main function to orchestrate all demonstrations
 def main():
     """Run all agent run method demonstrations."""
-    print("Starting Pydantic AI Agent Run Methods Tutorial Script\n")
+    print("[yellow]Starting Pydantic AI Agent Run Methods Tutorial Script[/yellow]\n")
 
     # Run the synchronous demonstration first
-    print("\n############# Running synchronous demonstration #############")
-    print("=== Synchronous Execution ===")
+    print("\n[cyan]############# Running synchronous demonstration #############[/cyan]")
+    print("[cyan]=== Synchronous Execution ===[/cyan]")
     demo_run_sync()
 
     # Run all asynchronous demonstrations sequentially
-    print("\n############# Running asynchronous demonstration #############")
-    print("=== Asynchronous Execution ===")
+    print("\n[cyan]############# Running asynchronous demonstration #############[/cyan]")
+    print("[cyan]=== Asynchronous Execution ===[/cyan]")
     asyncio.run(demo_run_async())
-    print("\n=== Stream Execution ===")
+    print("\n[cyan]=== Stream Execution ===[/cyan]")
     asyncio.run(demo_run_stream())
-    print("\n=== Stream Events Execution ===")
+    print("\n[cyan]=== Stream Events Execution ===[/cyan]")
     asyncio.run(demo_run_stream_events())
-    print("\n=== Iteration Execution ===")
+    print("\n[cyan]=== Iteration Execution ===[/cyan]")
     asyncio.run(demo_iter())
 
-    print("Tutorial script completed.")
+    print("[green]Tutorial script completed.[/green]")
 
 
 # Execute the main function when the script is run directly

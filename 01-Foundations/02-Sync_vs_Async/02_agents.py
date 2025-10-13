@@ -5,7 +5,7 @@ from datetime import date
 import logfire
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from pydantic_ai import Agent, RunContext
+from pydantic_ai import Agent, RunContext, UsageLimits, ModelSettings
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.ollama import OllamaProvider
 from pydantic_ai.providers.openai import OpenAIProvider
@@ -47,9 +47,7 @@ model = OpenAIChatModel(
 weather_agent = Agent(
     model,
     system_prompt="Provide weather forecasts using tools.",  # Define the agent's core instruction
-    model_settings={
-        "temperature": 0,  # Use a low temperature for more predictable and deterministic outputs
-    },
+    model_settings=ModelSettings(temperature=0),  # Use a low temperature for more predictable and deterministic outputs
 )
 
 ################################ Tool Implementation ################################
@@ -88,6 +86,9 @@ async def demo_run_stream_events():
 async def demo_iter():
     """Demonstrate agent.iter() to inspect the agent's thought process."""
 
+
+def conversation_example():
+    """Demonstrate a multi-turn conversation with the agent."""
 
 ################################ Main Execution Block ################################
 

@@ -69,7 +69,7 @@ async def get_weather(ctx: RunContext, location: str, query_date: date) -> str:
 # Demonstrate the standard async `run()` method
 async def demo_run_async():
     """Demonstrate agent.run(), which returns the final result asynchronously."""
-    print("[bold blue]=== agent.run() Example (Async) ===[/bold blue]")
+    print("[blue]=== agent.run() Example (Async) ===[/blue]")
     # Execute the agent and await the complete `RunResult`
     result = await weather_agent.run("Weather in Paris tomorrow?")
     print(f"Result: {result.output}")
@@ -78,7 +78,7 @@ async def demo_run_async():
 # Demonstrate the synchronous `run_sync()` method
 def demo_run_sync():
     """Demonstrate agent.run_sync() for use in synchronous code."""
-    print("[bold cyan]=== agent.run_sync() Example (Sync) ===[/bold cyan]")
+    print("[cyan]=== agent.run_sync() Example (Sync) ===[/cyan]")
     # Execute the agent and block until the final `RunResult` is available
     result = weather_agent.run_sync("Weather in London today?")
     print(f"Result: {result.output}")
@@ -87,19 +87,19 @@ def demo_run_sync():
 # Demonstrate streaming text output with `run_stream()`
 async def demo_run_stream():
     """Demonstrate agent.run_stream() for handling real-time text output."""
-    print("[bold magenta]=== agent.run_stream() Example (Async Stream) ===[/bold magenta]")
+    print("[magenta]=== agent.run_stream() Example (Async Stream) ===[/magenta]")
     # Use a context manager to handle the streaming response from the agent
     async with weather_agent.run_stream("Weather in Tokyo next week?") as response:
         # Iterate over incoming text chunks as the LLM generates them
         async for text in response.stream_text():
             print(text, end="")
-    print("\n[italic yellow]Stream complete.[/italic yellow]")
+    print("\n[yellow]Stream complete.[/yellow]")
 
 
 # Demonstrate processing structured events with `run_stream_events()`
 async def demo_run_stream_events():
     """Demonstrate agent.run_stream_events() for detailed, structured updates."""
-    print("[bold red]=== agent.run_stream_events() Example (Async Events) ===[/bold red]")
+    print("[red]=== agent.run_stream_events() Example (Async Events) ===[/red]")
     events = []
     # Iterate over each event generated during the agent's execution lifecycle
     async for event in weather_agent.run_stream_events("Weather in Berlin?"):
@@ -113,7 +113,7 @@ async def demo_run_stream_events():
 # Demonstrate iterating over the agent's internal steps with `iter()`
 async def demo_iter():
     """Demonstrate agent.iter() to inspect the agent's thought process."""
-    print("[bold purple]=== agent.iter() Example (Async Iteration) ===[/bold purple]")
+    print("[purple]=== agent.iter() Example (Async Iteration) ===[/purple]")
     # Use a context manager to access the agent's execution graph
     async with weather_agent.iter("Weather in Rome?") as agent_run:
         nodes = []
@@ -149,7 +149,7 @@ def main():
     print("\n[cyan]=== Iteration Execution ===[/cyan]")
     asyncio.run(demo_iter())
 
-    print("[green]Tutorial script completed.[/green]")
+    print("Tutorial script completed.")
 
 
 # Execute the main function when the script is run directly

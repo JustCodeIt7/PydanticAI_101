@@ -12,7 +12,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 from rich import print
 
-################################ Environment Setup ################################
+################### Environment Setup ################
 # Load environment variables from a .env file if one exists
 load_dotenv()
 
@@ -25,7 +25,7 @@ LOGFIRE_API_KEY = os.getenv("LOGFIRE_API_KEY")
 # logfire.configure(token=LOGFIRE_API_KEY)
 # logfire.instrument_pydantic_ai()
 
-################################ Agent Definition & Configuration ################################
+############### Agent Definition & Configuration ##################
 
 # Define an OpenAI model (gpt-4o-mini)
 # model = OpenAIChatModel("gpt-4o-mini", provider=OpenAIProvider(api_key=OPENAI_API_KEY))
@@ -50,7 +50,7 @@ weather_agent = Agent(
     model_settings=ModelSettings(temperature=0), # add model settings 
 )
 
-################################ Tool Implementation ################################
+##################### Tool Implementation ###################
 
 
 # Define a function and register it as a tool for the agent to use
@@ -61,7 +61,7 @@ async def get_weather(ctx: RunContext, location: str, query_date: date) -> str:
     return f"Sunny in {location} on {query_date}."
 
 
-################################ Agent Execution Demonstrations ################################
+################## Agent Execution Demonstrations #################
 
 
 # Demonstrate the standard async `run()` method

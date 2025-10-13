@@ -12,7 +12,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 from rich import print
 
-################################ Environment Setup ################################
+################### Environment Setup ################
 # Load environment variables from a .env file if one exists
 load_dotenv()
 
@@ -25,7 +25,7 @@ LOGFIRE_API_KEY = os.getenv("LOGFIRE_API_KEY")
 # logfire.configure(token=LOGFIRE_API_KEY)
 # logfire.instrument_pydantic_ai()
 
-################################ Agent Definition & Configuration ################################
+############### Agent Definition & Configuration ##################
 
 # Define an OpenAI model (gpt-4o-mini)
 # model = OpenAIChatModel("gpt-4o-mini", provider=OpenAIProvider(api_key=OPENAI_API_KEY))
@@ -40,17 +40,17 @@ model = OpenAIChatModel(
     model_name="gpt-oss:20b",
     provider=OllamaProvider(
         base_url="http://eos.local:11434/v1"
-    ),  # Use the local Ollama server endpoint
+    ),  
 )
 
 # Create an agent instance
 weather_agent = Agent(
     model,
     system_prompt="Provide weather forecasts using tools.",  # Define the agent's core instruction
-    model_settings=ModelSettings(temperature=0),  # Use a low temperature for more predictable and deterministic outputs
+    model_settings=ModelSettings(temperature=0), # add model settings 
 )
 
-################################ Tool Implementation ################################
+##################### Tool Implementation ###################
 
 
 # Define a function and register it as a tool for the agent to use
@@ -59,7 +59,7 @@ async def get_weather(ctx: RunContext, location: str, query_date: date) -> str:
     """Fetch weather data for a given location and date."""
 
 
-################################ Agent Execution Demonstrations ################################
+################## Agent Execution Demonstrations #################
 
 
 # Demonstrate the standard async `run()` method

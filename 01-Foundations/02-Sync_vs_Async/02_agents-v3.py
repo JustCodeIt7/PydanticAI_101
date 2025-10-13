@@ -1,16 +1,49 @@
 import asyncio
+import os
 from datetime import date
 
+# load environment variables from a .env file if present
+from dotenv import load_dotenv
+from pydantic import BaseModel
 from pydantic_ai import Agent, RunContext
+from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.providers.openrouter import OpenRouterProvider
+from pydantic_ai.providers.ollama import OllamaProvider
 from rich import print
+import logfire
+
+################################ Environment Setup ################################
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+LOGFIRE_API_KEY = os.getenv("LOGFIRE_API_KEY")
+# logfire.configure(token=LOGFIRE_API_KEY)
+# logfire.instrument_pydantic_ai()
 
 ################################ Agent Definition & Configuration ################################
+# OpenAI example (uncomment to use)
+# model = OpenAIChatModel("gpt-4o-mini", provider=OpenAIProvider(api_key=OPENAI_API_KEY))
+
+# OpenRouter example (uncomment to use)
+# model = OpenAIChatModel(
+#     "openai/gpt-oss-120b", provider=OpenRouterProvider(api_key=OPENROUTER_API_KEY)
+# )
+
+# Ollama example (uncomment to use)
+model = OpenAIChatModel(
+    model_name="gpt-oss:20b", provider=OllamaProvider(base_url="http://eos.local:11434/v1")
+)
 
 # Define a simple agent for weather forecasting
 weather_agent = Agent(
-    "openai:gpt-4o-mini",  # Specify the LLM, requiring an OpenAI API key
+    model,  # "openai:gpt-4o-mini",
     system_prompt="Provide weather forecasts using tools.",  # Define the agent's core instruction
-    model_settings={"temperature": 0.2},  # Set a low temperature for more deterministic outputs
+    model_settings={
+        "temperature": 0,
+        # "max_tokens": 500,
+    },  # Set a low temperature for more deterministic outputs
 )
 
 ################################ Tool Implementation ################################
@@ -19,6 +52,7 @@ weather_agent = Agent(
 # Register a function as a tool the agent can use
 @weather_agent.tool
 async def get_weather(ctx: RunContext, location: str, query_date: date) -> str:
+    """Fetch weather data for a given location and date."""
     # Simulate fetching weather data from an external API
     return f"Sunny in {location} on {query_date}."
 
@@ -94,18 +128,20 @@ def main():
     print("Starting Pydantic AI Agent Run Methods Tutorial Script\n")
 
     # Run the synchronous demonstration
+    print("\n############# Running synchronous demonstration #############")
+    print("=== Synchronous Execution ===")
     demo_run_sync()
-    print()
 
     # Run all asynchronous demonstrations
+    print("\n############# Running asynchronous demonstration #############")
+    print("=== Asynchronous Execution ===")
     asyncio.run(demo_run_async())
-    print()
+    print("\n=== Stream Execution ===")
     asyncio.run(demo_run_stream())
-    print()
+    print("\n=== Stream Events Execution ===")
     asyncio.run(demo_run_stream_events())
-    print()
+    print("\n=== Iteration Execution ===")
     asyncio.run(demo_iter())
-    print()
 
     print("Tutorial script completed.")
 

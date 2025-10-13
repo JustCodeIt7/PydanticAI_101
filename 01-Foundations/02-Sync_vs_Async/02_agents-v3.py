@@ -2,58 +2,64 @@ import asyncio
 import os
 from datetime import date
 
-# load environment variables from a .env file if present
+import logfire
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.ollama import OllamaProvider
 from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.providers.openrouter import OpenRouterProvider
-from pydantic_ai.providers.ollama import OllamaProvider
 from rich import print
-import logfire
 
 ################################ Environment Setup ################################
+# Load environment variables from a .env file if one exists
 load_dotenv()
 
+# Retrieve API keys from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 LOGFIRE_API_KEY = os.getenv("LOGFIRE_API_KEY")
+
+# Optional: Configure Logfire for detailed tracing and debugging
 # logfire.configure(token=LOGFIRE_API_KEY)
 # logfire.instrument_pydantic_ai()
 
 ################################ Agent Definition & Configuration ################################
-# OpenAI example (uncomment to use)
+
+# Define an OpenAI model (gpt-4o-mini)
 # model = OpenAIChatModel("gpt-4o-mini", provider=OpenAIProvider(api_key=OPENAI_API_KEY))
 
-# OpenRouter example (uncomment to use)
+# Define an OpenRouter model
 # model = OpenAIChatModel(
-#     "openai/gpt-oss-120b", provider=OpenRouterProvider(api_key=OPENROUTER_API_KEY)
+#     "openai/gpt-4-turbo", provider=OpenRouterProvider(api_key=OPENROUTER_API_KEY)
 # )
 
-# Ollama example (uncomment to use)
+# Define an Ollama model to connect to a local LLM instance
 model = OpenAIChatModel(
-    model_name="gpt-oss:20b", provider=OllamaProvider(base_url="http://eos.local:11434/v1")
+    model_name="gpt-oss:20b",
+    provider=OllamaProvider(
+        base_url="http://eos.local:11434/v1"
+    ),  # Use the local Ollama server endpoint
 )
 
-# Define a simple agent for weather forecasting
+# Create an agent instance
 weather_agent = Agent(
-    model,  # "openai:gpt-4o-mini",
+    model,
     system_prompt="Provide weather forecasts using tools.",  # Define the agent's core instruction
     model_settings={
-        "temperature": 0,
-        # "max_tokens": 500,
-    },  # Set a low temperature for more deterministic outputs
+        "temperature": 0,  # Use a low temperature for more predictable and deterministic outputs
+    },
 )
 
 ################################ Tool Implementation ################################
 
 
-# Register a function as a tool the agent can use
+# Define a function and register it as a tool for the agent to use
 @weather_agent.tool
 async def get_weather(ctx: RunContext, location: str, query_date: date) -> str:
     """Fetch weather data for a given location and date."""
-    # Simulate fetching weather data from an external API
+    # Simulate a call to an external weather API
     return f"Sunny in {location} on {query_date}."
 
 
@@ -64,7 +70,7 @@ async def get_weather(ctx: RunContext, location: str, query_date: date) -> str:
 async def demo_run_async():
     """Demonstrate agent.run(), which returns the final result asynchronously."""
     print("=== agent.run() Example (Async) ===")
-    # Execute the agent and wait for the complete `RunResult`
+    # Execute the agent and await the complete `RunResult`
     result = await weather_agent.run("Weather in Paris tomorrow?")
     print(f"Result: {result.output}")
 
@@ -82,9 +88,9 @@ def demo_run_sync():
 async def demo_run_stream():
     """Demonstrate agent.run_stream() for handling real-time text output."""
     print("=== agent.run_stream() Example (Async Stream) ===")
-    # Use a context manager to handle the streaming response
+    # Use a context manager to handle the streaming response from the agent
     async with weather_agent.run_stream("Weather in Tokyo next week?") as response:
-        # Iterate over incoming text chunks as they are generated
+        # Iterate over incoming text chunks as the LLM generates them
         async for text in response.stream_text():
             print(text, end="")
     print("\nStream complete.")
@@ -95,10 +101,10 @@ async def demo_run_stream_events():
     """Demonstrate agent.run_stream_events() for detailed, structured updates."""
     print("=== agent.run_stream_events() Example (Async Events) ===")
     events = []
-    # Iterate over each event generated during the agent's execution
+    # Iterate over each event generated during the agent's execution lifecycle
     async for event in weather_agent.run_stream_events("Weather in Berlin?"):
         events.append(event)
-        # Check if the event contains the final result and print it
+        # Check if the event contains the final result and print its output
         if hasattr(event, "result") and hasattr(event.result, "output"):
             print(f"Final Result: {event.result.output}")
     print(f"Total Events: {len(events)}")
@@ -122,17 +128,17 @@ async def demo_iter():
 ################################ Main Execution Block ################################
 
 
-# Orchestrate all demonstration functions
+# Define the main function to orchestrate all demonstrations
 def main():
-    """Main function to run all agent run method demonstrations."""
+    """Run all agent run method demonstrations."""
     print("Starting Pydantic AI Agent Run Methods Tutorial Script\n")
 
-    # Run the synchronous demonstration
+    # Run the synchronous demonstration first
     print("\n############# Running synchronous demonstration #############")
     print("=== Synchronous Execution ===")
     demo_run_sync()
 
-    # Run all asynchronous demonstrations
+    # Run all asynchronous demonstrations sequentially
     print("\n############# Running asynchronous demonstration #############")
     print("=== Asynchronous Execution ===")
     asyncio.run(demo_run_async())
@@ -146,6 +152,6 @@ def main():
     print("Tutorial script completed.")
 
 
-# Ensure the script runs only when executed directly
+# Execute the main function when the script is run directly
 if __name__ == "__main__":
     main()

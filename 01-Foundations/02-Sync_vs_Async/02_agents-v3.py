@@ -5,7 +5,7 @@ from datetime import date
 import logfire
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from pydantic_ai import Agent, RunContext
+from pydantic_ai import Agent, RunContext, UsageLimits, ModelSettings
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.ollama import OllamaProvider
 from pydantic_ai.providers.openai import OpenAIProvider
@@ -47,9 +47,7 @@ model = OpenAIChatModel(
 weather_agent = Agent(
     model,
     system_prompt="Provide weather forecasts using tools.",  # Define the agent's core instruction
-    model_settings={
-        "temperature": 0,  # Use a low temperature for more predictable and deterministic outputs
-    },
+    model_settings=ModelSettings(temperature=0),  # Use a low temperature for more predictable and deterministic outputs
 )
 
 ################################ Tool Implementation ################################
@@ -80,7 +78,7 @@ def demo_run_sync():
     """Demonstrate agent.run_sync() for use in synchronous code."""
     print("[cyan]=== agent.run_sync() Example (Sync) ===[/cyan]")
     # Execute the agent and block until the final `RunResult` is available
-    result = weather_agent.run_sync("Weather in London today?")
+    result = weather_agent.run_sync("Weather in London today?", usage_limits=UsageLimits(output_tokens_limit=500))
     print(f"Result: {result.output}")
 
 
@@ -89,7 +87,7 @@ async def demo_run_stream():
     """Demonstrate agent.run_stream() for handling real-time text output."""
     print("[magenta]=== agent.run_stream() Example (Async Stream) ===[/magenta]")
     # Use a context manager to handle the streaming response from the agent
-    async with weather_agent.run_stream("Weather in Tokyo next week?") as response:
+    async with weather_agent.run_stream("Weather in Tokyo next week?", usage_limits=UsageLimits(request_limit=10)) as response:
         # Iterate over incoming text chunks as the LLM generates them
         async for text in response.stream_text():
             print(text, end="")
@@ -125,6 +123,16 @@ async def demo_iter():
         print(f"[yellow]Nodes Processed: {len(nodes)}[/yellow]")
 
 
+def conversation_example():
+    """Demonstrate a multi-turn conversation with the agent."""
+    print("[green]=== Multi-turn Conversation Example ===[/green]")
+    # Start a conversation with an initial user message
+    result1 = weather_agent.run_sync("What's the weather in New York this weekend?")
+    print(f"[green] 1. Initial Result: {result1.output}[/green]")
+    result2  = weather_agent.run_sync("And in San Francisco?",message_history=result1.new_messages())
+    # Add a follow-up user message to the conversation
+    print(f"\n[purple] 2. Conversation Result: {result2.output}[/purple]")
+
 ################################ Main Execution Block ################################
 
 
@@ -135,19 +143,28 @@ def main():
 
     # Run the synchronous demonstration first
     print("\n[cyan]############# Running synchronous demonstration #############[/cyan]")
+    
     print("[cyan]=== Synchronous Execution ===[/cyan]")
     demo_run_sync()
 
     # Run all asynchronous demonstrations sequentially
     print("\n[cyan]############# Running asynchronous demonstration #############[/cyan]")
+    
     print("[cyan]=== Asynchronous Execution ===[/cyan]")
     asyncio.run(demo_run_async())
+    
     print("\n[cyan]=== Stream Execution ===[/cyan]")
     asyncio.run(demo_run_stream())
+    
     print("\n[cyan]=== Stream Events Execution ===[/cyan]")
     asyncio.run(demo_run_stream_events())
+    
     print("\n[cyan]=== Iteration Execution ===[/cyan]")
     asyncio.run(demo_iter())
+    
+    print("\n[cyan]=== Conversation Execution ===[/cyan]")
+    conversation_example()
+    
 
     print("Tutorial script completed.")
 

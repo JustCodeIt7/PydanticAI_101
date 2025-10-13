@@ -2,54 +2,60 @@ import asyncio
 import os
 from datetime import date
 
-# load environment variables from a .env file if present
+import logfire
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.ollama import OllamaProvider
 from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.providers.openrouter import OpenRouterProvider
-from pydantic_ai.providers.ollama import OllamaProvider
 from rich import print
-import logfire
 
 ################################ Environment Setup ################################
+# Load environment variables from a .env file if one exists
 load_dotenv()
 
+# Retrieve API keys from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 LOGFIRE_API_KEY = os.getenv("LOGFIRE_API_KEY")
+
+# Optional: Configure Logfire for detailed tracing and debugging
 # logfire.configure(token=LOGFIRE_API_KEY)
 # logfire.instrument_pydantic_ai()
 
 ################################ Agent Definition & Configuration ################################
-# OpenAI example (uncomment to use)
+
+# Define an OpenAI model (gpt-4o-mini)
 # model = OpenAIChatModel("gpt-4o-mini", provider=OpenAIProvider(api_key=OPENAI_API_KEY))
 
-# OpenRouter example (uncomment to use)
+# Define an OpenRouter model
 # model = OpenAIChatModel(
-#     "openai/gpt-oss-120b", provider=OpenRouterProvider(api_key=OPENROUTER_API_KEY)
+#     "openai/gpt-4-turbo", provider=OpenRouterProvider(api_key=OPENROUTER_API_KEY)
 # )
 
-# Ollama example (uncomment to use)
+# Define an Ollama model to connect to a local LLM instance
 model = OpenAIChatModel(
-    model_name="gpt-oss:20b", provider=OllamaProvider(base_url="http://eos.local:11434/v1")
+    model_name="gpt-oss:20b",
+    provider=OllamaProvider(
+        base_url="http://eos.local:11434/v1"
+    ),  # Use the local Ollama server endpoint
 )
 
-# Define a simple agent for weather forecasting
+# Create an agent instance
 weather_agent = Agent(
-    model,  # "openai:gpt-4o-mini",
+    model,
     system_prompt="Provide weather forecasts using tools.",  # Define the agent's core instruction
     model_settings={
-        "temperature": 0,
-        # "max_tokens": 500,
-    },  # Set a low temperature for more deterministic outputs
+        "temperature": 0,  # Use a low temperature for more predictable and deterministic outputs
+    },
 )
 
 ################################ Tool Implementation ################################
 
 
-# Register a function as a tool the agent can use
+# Define a function and register it as a tool for the agent to use
 @weather_agent.tool
 async def get_weather(ctx: RunContext, location: str, query_date: date) -> str:
     """Fetch weather data for a given location and date."""
@@ -86,11 +92,11 @@ async def demo_iter():
 ################################ Main Execution Block ################################
 
 
-# Orchestrate all demonstration functions
+# Define the main function to orchestrate all demonstrations
 def main():
-    """Main function to run all agent run method demonstrations."""
+    """Run all agent run method demonstrations."""
 
 
-# Ensure the script runs only when executed directly
+# Execute the main function when the script is run directly
 if __name__ == "__main__":
     main()

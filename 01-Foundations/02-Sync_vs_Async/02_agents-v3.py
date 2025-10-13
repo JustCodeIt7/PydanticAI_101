@@ -40,14 +40,14 @@ model = OpenAIChatModel(
     model_name="gpt-oss:20b",
     provider=OllamaProvider(
         base_url="http://eos.local:11434/v1"
-    ),  # Use the local Ollama server endpoint
+    ),  
 )
 
 # Create an agent instance
 weather_agent = Agent(
     model,
     system_prompt="Provide weather forecasts using tools.",  # Define the agent's core instruction
-    model_settings=ModelSettings(temperature=0),  # Use a low temperature for more predictable and deterministic outputs
+    model_settings=ModelSettings(temperature=0), # add model settings 
 )
 
 ################################ Tool Implementation ################################

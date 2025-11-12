@@ -1,4 +1,5 @@
 import asyncio
+import enum
 import os
 from datetime import date
 
@@ -6,6 +7,7 @@ import logfire
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from pydantic_ai import Agent, RunContext, UsageLimits, ModelSettings
+from pydantic_ai.mcp import ProcessToolCallback
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.ollama import OllamaProvider
 from pydantic_ai.providers.openai import OpenAIProvider
@@ -22,8 +24,8 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 LOGFIRE_API_KEY = os.getenv("LOGFIRE_API_KEY")
 
 # Optional: Configure Logfire for detailed tracing and debugging
-# logfire.configure(token=LOGFIRE_API_KEY)
-# logfire.instrument_pydantic_ai()
+logfire.configure(token=LOGFIRE_API_KEY)
+logfire.instrument_pydantic_ai()
 
 ############### Agent Definition & Configuration ##################
 
@@ -40,14 +42,14 @@ model = OpenAIChatModel(
     model_name="gpt-oss:20b",
     provider=OllamaProvider(
         base_url="http://eos.local:11434/v1"
-    ),  
+    ),
 )
 
 # Create an agent instance
 weather_agent = Agent(
     model,
     system_prompt="Provide weather forecasts using tools.",  # Define the agent's core instruction
-    model_settings=ModelSettings(temperature=0), # add model settings 
+    model_settings=ModelSettings(temperature=0), # add model settings
 )
 
 ##################### Tool Implementation ###################
@@ -97,7 +99,7 @@ async def demo_run_stream():
 # Demonstrate processing structured events with `run_stream_events()`
 async def demo_run_stream_events():
     """Demonstrate agent.run_stream_events() for detailed, structured updates."""
-    print("[red]=== agent.run_stream_events() Example (Async Events) ===[/red]")
+    print("[purple]=== agent.run_stream_events() Example (Async Events) ===[/purple]")
     events = []
     # Iterate over each event generated during the agent's execution lifecycle
     async for event in weather_agent.run_stream_events("Weather in Berlin?"):
@@ -143,28 +145,28 @@ def main():
 
     # Run the synchronous demonstration first
     print("\n[cyan]############# Running synchronous demonstration #############[/cyan]")
-    
+
     print("[cyan]=== Synchronous Execution ===[/cyan]")
     demo_run_sync()
 
     # Run all asynchronous demonstrations sequentially
     print("\n[cyan]############# Running asynchronous demonstration #############[/cyan]")
-    
+
     print("[cyan]=== Asynchronous Execution ===[/cyan]")
     asyncio.run(demo_run_async())
-    
+
     print("\n[cyan]=== Stream Execution ===[/cyan]")
     asyncio.run(demo_run_stream())
-    
+
     print("\n[cyan]=== Stream Events Execution ===[/cyan]")
     asyncio.run(demo_run_stream_events())
-    
+
     print("\n[cyan]=== Iteration Execution ===[/cyan]")
     asyncio.run(demo_iter())
-    
+
     print("\n[cyan]=== Conversation Execution ===[/cyan]")
     conversation_example()
-    
+
 
     print("Tutorial script completed.")
 
